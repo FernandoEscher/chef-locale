@@ -17,19 +17,19 @@
 # limitations under the License.
 #
 
-if platform?("ubuntu", "debian")
+if platform?('ubuntu', 'debian')
 
-  package "locales" do
+  package 'locales' do
     action :install
   end
 
-  execute "Install missing locale" do
+  execute 'Install missing locale' do
     not_if "grep -q #{node[:locale][:lang]} /var/lib/locales/supported.d/*"
     command "locale-gen #{node[:locale][:lang]}"
   end
 
-  execute "Update locale" do
-    lang_settings = ["LANG=#{node[:locale][:lang]}"]
+  execute 'Update locale' do
+    lang_settings = %W(LANG=#{node[:locale][:lang]})
     lang_settings << "LANGUAGE=#{node[:locale][:language]}" unless node[:locale][:language].nil?
     node[:locale].select { |k,v| k =~ /lc_.*/ }.each { |k, v|
       lang_settings << "#{k.upcase}=#{v}" unless v.nil?
@@ -48,9 +48,9 @@ if platform?("ubuntu", "debian")
 
 end
 
-if platform?("redhat", "centos", "fedora")
+if platform?('redhat', 'centos', 'fedora')
 
-  execute "Update locale" do
+  execute 'Update locale' do
     command "locale -a | grep -qx #{node[:locale][:lang]} && sed -i 's|LANG=.*|LANG=#{node[:locale][:lang]}|' /etc/sysconfig/i18n"
     not_if "grep -qx LANG=#{node[:locale][:lang]} /etc/sysconfig/i18n"
   end
