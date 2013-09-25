@@ -1,0 +1,19 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: true
+
+platforms:
+- name: ubuntu-12.04
+  driver_config:
+    box: precise64
+    box_url: http://files.vagrantup.com/precise64.box
+
+suites:
+- name: default
+  run_list: ["recipe[chef-locale]"]
+  attributes: {
+    "locale": {
+      "lang": "en_US.UTF-8"
+    }
+  }
