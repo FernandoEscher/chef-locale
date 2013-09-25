@@ -14,6 +14,8 @@ suites:
   run_list: ["recipe[chef-locale]"]
   attributes: {
     "locale": {
-      "lang": "en_US.UTF-8"
+      "lang": "en_US.UTF-8",
+      "lc_messages": "ru_RU.UTF-8",
+      "lc_ctype": "en_US.UTF-8"
     }
   }

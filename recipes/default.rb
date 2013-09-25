@@ -23,17 +23,16 @@ if platform?('ubuntu', 'debian')
     action :install
   end
 
-  execute 'Install missing locale' do
-    not_if "grep -q #{node[:locale][:lang]} /var/lib/locales/supported.d/*"
-    command "locale-gen #{node[:locale][:lang]}"
+  node[:locale].values.uniq.each do |locale|
+    execute "Install missing locale #{locale}" do
+      not_if "grep -q #{locale} /var/lib/locales/supported.d/*"
+      command "locale-gen #{locale}"
+    end if locale.match(/[a-zA-Z]+_[a-zA-Z]+\.[a-zA-Z0-9-]+/)
   end
 
   execute 'Update locale' do
-    lang_settings = %W(LANG=#{node[:locale][:lang]})
-    lang_settings << "LANGUAGE=#{node[:locale][:language]}" unless node[:locale][:language].nil?
-    node[:locale].select { |k,v| k =~ /lc_.*/ }.each { |k, v|
-      lang_settings << "#{k.upcase}=#{v}" unless v.nil?
-    }
+    lang_settings = node[:locale].to_a.map{|locale| "#{locale[0].upcase}=#{locale[1]}" unless locale[1].nil?}
+    Chef::Log.debug("locale settings is #{lang_settings}")
 
     command_string = "update-locale --reset #{lang_settings.join(' ')}"
     Chef::Log.debug("locale command is #{command_string.inspect}")
