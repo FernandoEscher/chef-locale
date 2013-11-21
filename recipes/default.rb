@@ -25,8 +25,9 @@ if platform?('ubuntu', 'debian')
 
   node[:locale].values.uniq.each do |locale|
     execute "Install missing locale #{locale}" do
-      not_if "grep -q #{locale} /var/lib/locales/supported.d/*"
-      command "locale-gen #{locale}"
+      not_if "locale -a | grep #{locale}"
+      command "locale-gen \"#{locale}\""
+      command "dpkg-reconfigure locales"
     end if locale.match(/[a-zA-Z]+_[a-zA-Z]+\.[a-zA-Z0-9-]+/)
   end
 
